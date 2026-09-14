@@ -208,7 +208,7 @@
     </div>
   </div>
 
-  <!-- Blockly Toolbox (로컬 구성 일치) -->
+  <!-- Blockly Toolbox 정의 -->
   <xml id="toolbox" style="display: none">
     <category name="기초" colour="#5b80a5">
       <block type="arduino_setup_loop"></block>
@@ -387,7 +387,7 @@
       }
     };
 
-    // 코드 변환 엔진
+    // C++ 코드 생성기
     function generateArduinoCode(workspace) {
       let setupCode = "";
       let loopCode = "";
@@ -446,7 +446,7 @@
       return "";
     }
 
-    // Blockly 초기화
+    // Blockly 주입
     const blocklyArea = document.getElementById('blocklyArea');
     const blocklyDiv = document.getElementById('blocklyDiv');
 
@@ -457,7 +457,7 @@
       trashcan: true
     });
 
-    // 기본 블록 세팅 (첫 화면)
+    // 화면 로딩 시 자동 초기화 블록 세팅
     const initialXml = `
       <xml xmlns="https://developers.google.com/blockly/xml">
         <block type="arduino_setup_loop" x="20" y="20">
@@ -486,6 +486,13 @@
     `;
     Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(initialXml), workspace);
 
+    // 기본적으로 '기초' 카테고리를 열어둔 상태로 표시
+    setTimeout(() => {
+      if (workspace.toolbox_) {
+        workspace.toolbox_.selectItemByPosition(0);
+      }
+    }, 200);
+
     const onresize = function() {
       let element = blocklyArea;
       let x = 0;
@@ -513,7 +520,7 @@
     workspace.addChangeListener(updateCode);
     updateCode();
 
-    // 시리얼 및 업로드
+    // 시리얼 및 업로드 기능
     let port;
     let reader;
 
