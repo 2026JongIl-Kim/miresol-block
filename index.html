@@ -16,21 +16,27 @@
             margin: 0;
             padding: 0;
         }
-        body {
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             font-family: 'Noto Sans KR', sans-serif;
+        }
+        body {
             display: flex;
             flex-direction: column;
-            height: 100vh;
             background-color: #f8f9fa;
         }
         header {
+            height: 50px;
             background-color: #003366;
             color: white;
-            padding: 10px 20px;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 100;
         }
         .logo-container {
             display: flex;
@@ -38,11 +44,11 @@
             gap: 12px;
         }
         .logo-container img {
-            height: 38px;
+            height: 32px;
             width: auto;
         }
         .logo-container h1 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
         }
         .btn-group {
@@ -50,12 +56,13 @@
             gap: 10px;
         }
         button {
-            padding: 8px 16px;
+            padding: 6px 14px;
             border: none;
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
+            font-size: 0.85rem;
         }
         .btn-upload {
             background-color: #28a745;
@@ -72,27 +79,38 @@
             background-color: #138496;
         }
         #main-container {
+            position: relative;
+            width: 100vw;
+            height: calc(100vh - 50px);
             display: flex;
-            flex: 1;
-            height: calc(100vh - 60px);
         }
-        #blocklyDiv {
-            flex: 7;
+        #blocklyArea {
+            position: relative;
+            flex: 1;
             height: 100%;
         }
+        #blocklyDiv {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
         #codeContainer {
-            flex: 3;
+            width: 350px;
+            height: 100%;
             background-color: #1e1e1e;
             color: #d4d4d4;
             display: flex;
             flex-direction: column;
             border-left: 2px solid #333;
+            z-index: 10;
         }
         #codeHeader {
             background-color: #252526;
             padding: 10px 15px;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #9cdcfe;
             border-bottom: 1px solid #333;
         }
@@ -106,10 +124,14 @@
             color: #dcdcaa;
         }
         #statusArea {
-            padding: 10px 15px;
+            padding: 8px 15px;
             background-color: #007acc;
             color: white;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+        }
+        /* Blockly Flyout z-index 보정 */
+        .blocklyFlyout {
+            z-index: 50 !important;
         }
     </style>
 </head>
@@ -127,7 +149,9 @@
     </header>
 
     <div id="main-container">
-        <div id="blocklyDiv"></div>
+        <div id="blocklyArea">
+            <div id="blocklyDiv"></div>
+        </div>
         <div id="codeContainer">
             <div id="codeHeader">Generated Arduino C++ Code</div>
             <div id="codeArea">// 블록을 조립하면 코드가 여기에 생성됩니다.</div>
@@ -164,9 +188,6 @@
     </xml>
 
     <script>
-        // ==========================================
-        // 🌐 클라우드 백엔드 API 주소 설정
-        // ==========================================
         const BACKEND_API_URL = 'https://miresol-backend.onrender.com/api/compile';
 
         // 1. 커스텀 블록 정의
@@ -247,14 +268,36 @@
             return code + ArduinoCode.blockToCode(nextBlock);
         };
 
-        // 3. Blockly 워크스페이스 초기화
-        const workspace = Blockly.inject('blocklyDiv', {
+        // 3. Blockly 워크스페이스 주입 및 리사이즈 처리
+        const blocklyArea = document.getElementById('blocklyArea');
+        const blocklyDiv = document.getElementById('blocklyDiv');
+
+        const workspace = Blockly.inject(blocklyDiv, {
             toolbox: document.getElementById('toolbox'),
             scrollbars: true,
             zoom: { controls: true, wheel: true }
         });
 
-        // 4. 실시간 C++ 코드 생성
+        const onresize = function() {
+            let element = blocklyArea;
+            let x = 0;
+            let y = 0;
+            do {
+                x += element.offsetLeft;
+                y += element.offsetTop;
+                element = element.offsetParent;
+            } while (element);
+            blocklyDiv.style.left = x + 'px';
+            blocklyDiv.style.top = y + 'px';
+            blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+            blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+            Blockly.svgResize(workspace);
+        };
+
+        window.addEventListener('resize', onresize, false);
+        onresize();
+
+        // 4. 실시간 C++ 코드 업데이트
         function updateGeneratedCode() {
             const blocksCode = ArduinoCode.workspaceToCode(workspace);
             const fullCode = `#include <Arduino.h>\n\nvoid setup() {\n${blocksCode}}\n\nvoid loop() {\n  // 반복 실행할 코드\n}\n`;
@@ -264,14 +307,19 @@
 
         workspace.addChangeListener(updateGeneratedCode);
 
-        // UI 유틸리티
+        // UI 제어
         function updateStatus(msg) {
             document.getElementById('statusArea').textContent = "상태: " + msg;
         }
 
         function toggleCodePanel() {
             const panel = document.getElementById('codeContainer');
-            panel.style.display = (panel.style.display === 'none') ? 'flex' : 'none';
+            if (panel.style.display === 'none') {
+                panel.style.display = 'flex';
+            } else {
+                panel.style.display = 'none';
+            }
+            onresize(); // 패널 토글 시 화면 크기 재계산
         }
 
         // 5. 서버 컴파일 및 보드 업로드
@@ -280,7 +328,6 @@
             updateStatus("클라우드 서버에 컴파일 요청 중...");
 
             try {
-                // Render 클라우드 백엔드로 컴파일 요청
                 const response = await fetch(BACKEND_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -295,13 +342,11 @@
                 updateStatus("HEX 바이너리 수신 완료! 웹 시리얼 업로드 시작...");
                 const hexArrayBuffer = await response.arrayBuffer();
 
-                // Web Serial API 기반 Avrgirl 인스턴스 생성
                 const avrgirl = new AvrgirlArduino({
                     board: 'uno',
                     debug: true
                 });
 
-                // 바이너리 주입 실행
                 avrgirl.flash(hexArrayBuffer, (err) => {
                     if (err) {
                         console.error(err);
