@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>아두이노 블록코딩 플랫폼</title>
+  <title>Miresol Block Platform</title>
   <!-- Google Blockly 9.3.0 및 한국어 팩 -->
   <script src="https://unpkg.com/blockly@9.3.0/blockly_compressed.js"></script>
   <script src="https://unpkg.com/blockly@9.3.0/blocks_compressed.js"></script>
@@ -171,7 +171,7 @@
       cursor: pointer;
     }
 
-    /* 좌측 카테고리 툴박스 디자인 강제 설정 (이미지와 동일하게 정렬) */
+    /* 툴박스 메뉴 높이 및 글자 크기 조정 */
     .blocklyToolboxDiv {
       background-color: #e0e0e0 !important;
       padding: 0 !important;
@@ -183,8 +183,8 @@
       padding-left: 8px !important;
     }
     .blocklyTreeRow {
-      height: 38px !important;
-      line-height: 38px !important;
+      height: 36px !important;
+      line-height: 36px !important;
       padding-left: 4px !important;
     }
   </style>
@@ -194,11 +194,11 @@
   <header>
     <div class="logo-container">
       <img src="log.png" alt="미레솔 로고" class="company-logo" onerror="this.onerror=null; this.src='log.png';">
-      <h1>아두이노 블록코딩 플랫폼</h1>
+      <h1>Miresol Block Platform</h1>
     </div>
     <div class="header-btns">
       <button class="btn-serial" onclick="toggleSerialPort()">🔌 보드 연결 / 모니터 열기</button>
-      <button class="btn-upload" onclick="uploadCode()">아두이노에 업로드 🚀</button>
+      <button class="btn-upload" onclick="uploadCode()">보드에 업로드 🚀</button>
     </div>
   </header>
 
@@ -208,7 +208,7 @@
     </div>
     <div class="right-panel">
       <div class="code-container">
-        <div class="panel-header" style="color:#3498db;">📄 실시간 아두이노 C/C++ 코드</div>
+        <div class="panel-header" style="color:#3498db;">Generated Arduino C++ Code</div>
         <pre id="codeView"></pre>
       </div>
       <div class="serial-container">
@@ -216,7 +216,7 @@
           <span>📺 시리얼 모니터 (9600 bps)</span>
           <button onclick="clearSerialOutput()" style="background:none; border:none; color:#aaa; cursor:pointer;">지우기</button>
         </div>
-        <pre id="serialOutput">[안내] 상단의 '보드 연결' 버튼을 눌러 포트를 연결하거나 '아두이노에 업로드'를 진행하세요.&#10;</pre>
+        <pre id="serialOutput">상태: 대기 중&#10;</pre>
         <div class="serial-input-box">
           <input type="text" id="serialInput" placeholder="시리얼 전송 데이터 입력..." onkeypress="if(event.key==='Enter') sendSerialData()">
           <button onclick="sendSerialData()">전송</button>
@@ -225,7 +225,7 @@
     </div>
   </div>
 
-  <!-- 이미지 원본과 동일한 카테고리 명칭 및 색상 설정 -->
+  <!-- 순수 한글 10개 카테고리 정의 -->
   <xml id="toolbox" style="display: none">
     <category name="기초" colour="#4a90e2">
       <block type="arduino_setup_loop"></block>
@@ -412,8 +412,9 @@
         loopCode = getBlockCode(rootBlock.getInputTargetBlock('LOOP'), "  ");
       }
 
-      let fullCode = "void setup() {\n" + setupCode + "}\n\n";
-      fullCode += "void loop() {\n" + loopCode + "}";
+      let fullCode = "#include <Arduino.h>\n\n";
+      fullCode += "void setup() {\n" + setupCode + "}\n\n";
+      fullCode += "void loop() {\n" + (loopCode ? loopCode : "  // 반복 실행할 코드\n") + "}";
 
       return fullCode;
     }
@@ -472,38 +473,10 @@
 
     const initialXml = `
       <xml xmlns="https://developers.google.com/blockly/xml">
-        <block type="arduino_setup_loop" x="20" y="20">
-          <statement name="SETUP">
-            <block type="serial_begin">
-              <field name="BAUD">9600</field>
-            </block>
-          </statement>
-          <statement name="LOOP">
-            <block type="serial_print">
-              <field name="NEWLINE">TRUE</field>
-              <value name="CONTENT">
-                <shadow type="text">
-                  <field name="TEXT">미레솔 아두이노 테스트</field>
-                </shadow>
-              </value>
-              <next>
-                <block type="arduino_delay">
-                  <field name="DELAY_TIME">1000</field>
-                </block>
-              </next>
-            </block>
-          </statement>
-        </block>
+        <block type="arduino_setup_loop" x="20" y="20"></block>
       </xml>
     `;
     Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(initialXml), workspace);
-
-    // 스크롤 상단 고정
-    setTimeout(() => {
-      if (workspace.toolbox_) {
-        workspace.toolbox_.selectItemByPosition(0);
-      }
-    }, 200);
 
     const onresize = function() {
       let element = blocklyArea;
