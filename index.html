@@ -176,7 +176,8 @@
 
   <header>
     <div class="logo-container">
-      <img src="log.png" alt="미레솔 로고" class="company-logo" onerror="this.style.display='none'">
+      <!-- logo.png 및 log.png 경로 자동 대응 -->
+      <img src="logo.png" alt="미레솔 로고" class="company-logo" onerror="this.onerror=null; this.src='log.png';">
       <h1>아두이노 블록코딩 플랫폼</h1>
     </div>
     <div class="header-btns">
@@ -212,7 +213,6 @@
     <category name="기초" colour="#4A90E2">
       <block type="arduino_setup_loop"></block>
     </category>
-
     <category name="입출력" colour="#9966FF">
       <block type="arduino_digital_write">
         <value name="PIN"><shadow type="arduino_pin_dropdown"></shadow></value>
@@ -307,9 +307,6 @@
   </xml>
 
   <script>
-    // ==========================================
-    // Render 백엔드 컴파일 API 주소
-    // ==========================================
     const BACKEND_API_URL = 'https://miresol-backend.onrender.com/api/compile';
 
     const ARDUINO_PINS = [
@@ -698,12 +695,13 @@
       }
     };
 
-    // Blockly 주입 및 반응형 리사이즈 처리
     const blocklyArea = document.getElementById('blocklyArea');
     const blocklyDiv = document.getElementById('blocklyDiv');
 
+    // media CDN 지정으로 블록 아이콘 깨짐 방지
     const workspace = Blockly.inject(blocklyDiv, {
       toolbox: document.getElementById('toolbox'),
+      media: 'https://unpkg.com/blockly@9.3.0/media/',
       scrollbars: true,
       trashcan: true
     });
@@ -762,9 +760,6 @@
     Blockly.Xml.domToWorkspace(Blockly.utils.xml.textToDom(defaultXml), workspace);
     updateCode();
 
-    /* ====================================================
-       Web Serial API 및 자동 웹 업로드 연동
-       ==================================================== */
     let port;
     let reader;
 
@@ -834,7 +829,6 @@
       document.getElementById('serialOutput').textContent = '';
     }
 
-    /* 백엔드 컴파일 서버 통신 & 자동 플래싱 구현 */
     async function uploadCode() {
       const currentCode = document.getElementById('codeView').textContent;
 
@@ -843,7 +837,6 @@
         return;
       }
 
-      // 시리얼 모니터 열려있을 경우 포트 점유 해제
       if (port && port.connected) {
         try {
           if (reader) await reader.cancel();
@@ -855,7 +848,6 @@
       appendSerialLog('\n[업로드 시작] 1. Render 클라우드 컴파일 서버로 코드를 전송합니다...');
 
       try {
-        // 백엔드 컴파일 서버 요청
         const response = await fetch(BACKEND_API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -872,10 +864,8 @@
 
         appendSerialLog('\n[업로드 시작] 2. 바이너리(.hex) 수신 완료! 아두이노 보드로 주입을 시도합니다...');
 
-        // 바이너리 혜택 데이터 수신
         const hexArrayBuffer = await response.arrayBuffer();
 
-        // avrgirl-arduino 활용 플래싱 실행
         if (typeof AvrgirlArduino !== 'undefined') {
           const avrgirl = new AvrgirlArduino({
             board: 'uno',
