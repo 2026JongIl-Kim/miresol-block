@@ -1,9 +1,9 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Miresol Block Platform</title>
-  <!-- Google Blockly 9.3.0 라이브러리 및 한국어 팩 -->
+  <title>미레솔 - 아두이노 블록코딩 플랫폼</title>
+  <!-- Google Blockly 9.3.0 및 한국어 팩 -->
   <script src="https://unpkg.com/blockly@9.3.0/blockly_compressed.js"></script>
   <script src="https://unpkg.com/blockly@9.3.0/blocks_compressed.js"></script>
   <script src="https://unpkg.com/blockly@9.3.0/msg/ko.js"></script>
@@ -18,7 +18,7 @@
       height: 100%;
       overflow: hidden;
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Malgun Gothic', 'Segoe UI', Tahoma, sans-serif;
     }
     body {
       display: flex;
@@ -54,7 +54,7 @@
       margin: 0;
       font-size: 18px;
       font-weight: 600;
-      color: #e2e8f0;
+      color: #ffffff;
     }
     .header-btns {
       display: flex;
@@ -69,10 +69,10 @@
       cursor: pointer;
       color: white;
     }
-    .btn-upload { background-color: #27ae60; }
-    .btn-upload:hover { background-color: #219150; }
-    .btn-serial { background-color: #007acc; }
-    .btn-serial:hover { background-color: #005999; }
+    .btn-serial { background-color: #16a085; }
+    .btn-serial:hover { background-color: #138d75; }
+    .btn-upload { background-color: #e67e22; }
+    .btn-upload:hover { background-color: #d35400; }
 
     .main-container {
       position: relative;
@@ -177,11 +177,11 @@
   <header>
     <div class="logo-container">
       <img src="log.png" alt="미레솔 로고" class="company-logo" onerror="this.onerror=null; this.src='log.png';">
-      <h1>Miresol Block Platform</h1>
+      <h1>아두이노 블록코딩 플랫폼</h1>
     </div>
     <div class="header-btns">
       <button class="btn-serial" onclick="toggleSerialPort()">🔌 보드 연결 / 모니터 열기</button>
-      <button class="btn-upload" onclick="uploadCode()">보드에 업로드 🚀</button>
+      <button class="btn-upload" onclick="uploadCode()">아두이노에 업로드 🚀</button>
     </div>
   </header>
 
@@ -191,7 +191,7 @@
     </div>
     <div class="right-panel">
       <div class="code-container">
-        <div class="panel-header">Generated Arduino C++ Code</div>
+        <div class="panel-header" style="color:#3498db;">📄 실시간 아두이노 C/C++ 코드</div>
         <pre id="codeView"></pre>
       </div>
       <div class="serial-container">
@@ -199,7 +199,7 @@
           <span>📺 시리얼 모니터 (9600 bps)</span>
           <button onclick="clearSerialOutput()" style="background:none; border:none; color:#aaa; cursor:pointer;">지우기</button>
         </div>
-        <pre id="serialOutput">상태: 대기 중&#10;</pre>
+        <pre id="serialOutput">[안내] 상단의 '보드 연결' 버튼을 눌러 포트를 연결하거나 '아두이노에 업로드'를 진행하세요.&#10;</pre>
         <div class="serial-input-box">
           <input type="text" id="serialInput" placeholder="시리얼 전송 데이터 입력..." onkeypress="if(event.key==='Enter') sendSerialData()">
           <button onclick="sendSerialData()">전송</button>
@@ -208,21 +208,20 @@
     </div>
   </div>
 
-  <!-- Blockly Toolbox 정의 -->
+  <!-- Blockly Toolbox (로컬 구성 일치) -->
   <xml id="toolbox" style="display: none">
-    <category name="입출력 (GPIO)" colour="#9966FF">
+    <category name="기초" colour="#5b80a5">
+      <block type="arduino_setup_loop"></block>
+      <block type="arduino_delay"></block>
+    </category>
+
+    <category name="입출력" colour="#a5745b">
       <block type="arduino_digital_write">
         <value name="PIN"><shadow type="arduino_pin_dropdown"></shadow></value>
         <value name="STATE"><shadow type="arduino_high_low_dropdown"><field name="STATE">HIGH</field></shadow></value>
       </block>
       <block type="arduino_digital_read">
         <value name="PIN"><shadow type="arduino_pin_dropdown"></shadow></value>
-      </block>
-      <block type="arduino_digital_read_pullup">
-        <value name="PIN"><shadow type="arduino_pin_dropdown"></shadow></value>
-      </block>
-      <block type="arduino_builtin_led_write">
-        <value name="STATE"><shadow type="arduino_high_low_dropdown"><field name="STATE">HIGH</field></shadow></value>
       </block>
       <block type="arduino_analog_write">
         <value name="PIN"><shadow type="arduino_pin_dropdown"></shadow></value>
@@ -231,70 +230,49 @@
       <block type="arduino_analog_read">
         <value name="PIN"><shadow type="arduino_pin_dropdown"></shadow></value>
       </block>
-      <block type="arduino_high_low_dropdown"><field name="STATE">HIGH</field></block>
-      <block type="arduino_high_low_dropdown"><field name="STATE">LOW</field></block>
     </category>
 
-    <category name="시간 (Delay)" colour="#808080">
+    <category name="시간" colour="#808080">
       <block type="arduino_delay"></block>
     </category>
 
-    <category name="시리얼 통신" colour="#707070">
-      <block type="serial_begin"></block>
-      <block type="serial_print">
-        <value name="CONTENT"><shadow type="text"><field name="TEXT">hello</field></shadow></value>
-      </block>
-      <block type="serial_read_val"></block>
-      <block type="serial_read_length"></block>
-      <block type="serial_flush"></block>
-      <block type="serial_available_if"></block>
+    <category name="조건" colour="#5b67a5">
+      <block type="controls_if"></block>
     </category>
 
-    <category name="제어 (Loops)" colour="#4C97FF">
-      <block type="controls_if"></block>
+    <category name="반복" colour="#5ba55b">
       <block type="controls_repeat_ext">
         <value name="TIMES">
           <shadow type="math_number"><field name="NUM">10</field></shadow>
         </value>
       </block>
+    </category>
+
+    <category name="판단" colour="#5ba5a5">
       <block type="logic_compare"></block>
       <block type="logic_operation"></block>
-      <block type="logic_boolean"><field name="BOOL">TRUE</field></block>
-      <block type="logic_boolean"><field name="BOOL">FALSE</field></block>
       <block type="logic_negate"></block>
     </category>
 
-    <category name="수학 (Math)" colour="#00A859">
+    <category name="수학" colour="#5b80a5">
       <block type="math_number"><field name="NUM">0</field></block>
       <block type="math_arithmetic"></block>
-      <block type="math_modulo">
-        <value name="DIVIDEND"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
-        <value name="DIVISOR"><shadow type="math_number"><field name="NUM">2</field></shadow></value>
-      </block>
-      <block type="math_round_custom">
-        <value name="NUM"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
-      </block>
-      <block type="math_map">
-        <value name="NUM"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
-        <value name="FROM_LOW"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
-        <value name="FROM_HIGH"><shadow type="math_number"><field name="NUM">1023</field></shadow></value>
-        <value name="TO_LOW"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
-        <value name="TO_HIGH"><shadow type="math_number"><field name="NUM">100</field></shadow></value>
-      </block>
-      <block type="math_constrain">
-        <value name="VALUE"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
-        <value name="LOW"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
-        <value name="HIGH"><shadow type="math_number"><field name="NUM">1023</field></shadow></value>
-      </block>
       <block type="math_random_int">
         <value name="FROM"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
         <value name="TO"><shadow type="math_number"><field name="NUM">100</field></shadow></value>
       </block>
     </category>
 
+    <category name="통신" colour="#707070">
+      <block type="serial_begin"></block>
+      <block type="serial_print">
+        <value name="CONTENT"><shadow type="text"><field name="TEXT">미레솔 아두이노 테스트</field></shadow></value>
+      </block>
+    </category>
+
     <sep></sep>
-    <category name="변수" custom="VARIABLE" colour="#FF6600"></category>
-    <category name="함수" custom="PROCEDURE" colour="#FF1493"></category>
+    <category name="변수" custom="VARIABLE" colour="#a55ba5"></category>
+    <category name="함수" custom="PROCEDURE" colour="#995ba5"></category>
   </xml>
 
   <script>
@@ -308,6 +286,17 @@
     ];
 
     // 커스텀 블록 정의
+    Blockly.Blocks['arduino_setup_loop'] = {
+      init: function() {
+        this.appendDummyInput().appendField("처음 한 번 실행하기 setup()");
+        this.appendStatementInput("SETUP");
+        this.appendDummyInput().appendField("반복하기 loop()");
+        this.appendStatementInput("LOOP");
+        this.setColour("#5ba55b");
+        this.setDeletable(false);
+      }
+    };
+
     Blockly.Blocks['arduino_pin_dropdown'] = {
       init: function() {
         this.appendDummyInput().appendField(new Blockly.FieldDropdown(ARDUINO_PINS), "PIN");
@@ -332,7 +321,7 @@
         this.appendDummyInput().appendField("출력하기");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
-        this.setColour("#9966FF");
+        this.setColour("#a5745b");
         this.setInputsInline(true);
       }
     };
@@ -342,29 +331,7 @@
         this.appendValueInput("PIN").appendField("핀");
         this.appendDummyInput().appendField("디지털 입력 값");
         this.setOutput(true, Boolean);
-        this.setColour("#9966FF");
-        this.setInputsInline(true);
-      }
-    };
-
-    Blockly.Blocks['arduino_digital_read_pullup'] = {
-      init: function() {
-        this.appendValueInput("PIN").appendField("핀");
-        this.appendDummyInput().appendField("디지털 입력 값 풀업");
-        this.setOutput(true, Boolean);
-        this.setColour("#9966FF");
-        this.setInputsInline(true);
-      }
-    };
-
-    Blockly.Blocks['arduino_builtin_led_write'] = {
-      init: function() {
-        this.appendDummyInput().appendField("내장 LED");
-        this.appendValueInput("STATE").appendField("디지털 값");
-        this.appendDummyInput().appendField("출력하기");
-        this.setPreviousStatement(true, null);
-        this.setNextStatement(true, null);
-        this.setColour("#9966FF");
+        this.setColour("#a5745b");
         this.setInputsInline(true);
       }
     };
@@ -376,7 +343,7 @@
         this.appendDummyInput().appendField("출력하기");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
-        this.setColour("#9966FF");
+        this.setColour("#a5745b");
         this.setInputsInline(true);
       }
     };
@@ -386,7 +353,7 @@
         this.appendValueInput("PIN").appendField("핀");
         this.appendDummyInput().appendField("아날로그 입력 값");
         this.setOutput(true, Number);
-        this.setColour("#9966FF");
+        this.setColour("#a5745b");
         this.setInputsInline(true);
       }
     };
@@ -397,64 +364,6 @@
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(60);
-      }
-    };
-
-    Blockly.Blocks['math_modulo'] = {
-      init: function() {
-        this.appendValueInput("DIVIDEND");
-        this.appendValueInput("DIVISOR").appendField("을(를)");
-        this.appendDummyInput().appendField("(으)로 나눈 나머지");
-        this.setOutput(true, Number);
-        this.setColour("#00A859");
-        this.setInputsInline(true);
-      }
-    };
-
-    Blockly.Blocks['math_round_custom'] = {
-      init: function() {
-        this.appendValueInput("NUM");
-        this.appendDummyInput().appendField("의 소수점").appendField(new Blockly.FieldDropdown([["반올림", "ROUND"], ["버림", "FLOOR"], ["올림", "CEIL"]]), "MODE");
-        this.setOutput(true, Number);
-        this.setColour("#00A859");
-        this.setInputsInline(true);
-      }
-    };
-
-    Blockly.Blocks['math_map'] = {
-      init: function() {
-        this.appendValueInput("NUM");
-        this.appendValueInput("FROM_LOW").appendField("의 값의 범위를");
-        this.appendValueInput("FROM_HIGH").appendField("~");
-        this.appendValueInput("TO_LOW").appendField("에서");
-        this.appendValueInput("TO_HIGH").appendField("~");
-        this.appendDummyInput().appendField("(으)로 변환한 값");
-        this.setOutput(true, Number);
-        this.setColour("#00A859");
-        this.setInputsInline(true);
-      }
-    };
-
-    Blockly.Blocks['math_constrain'] = {
-      init: function() {
-        this.appendValueInput("VALUE");
-        this.appendValueInput("LOW").appendField("의 값을");
-        this.appendValueInput("HIGH").appendField("~");
-        this.appendDummyInput().appendField("사이에 맞춘 값");
-        this.setOutput(true, Number);
-        this.setColour("#00A859");
-        this.setInputsInline(true);
-      }
-    };
-
-    Blockly.Blocks['math_random_int'] = {
-      init: function() {
-        this.appendValueInput("FROM");
-        this.appendValueInput("TO").appendField("부터");
-        this.appendDummyInput().appendField("사이의 난수");
-        this.setOutput(true, Number);
-        this.setColour("#00A859");
-        this.setInputsInline(true);
       }
     };
 
@@ -478,62 +387,19 @@
       }
     };
 
-    Blockly.Blocks['serial_read_val'] = {
-      init: function() {
-        this.appendDummyInput().appendField("시리얼 통신 수신 값");
-        this.setOutput(true, String);
-        this.setColour("#707070");
-      }
-    };
-
-    Blockly.Blocks['serial_read_length'] = {
-      init: function() {
-        this.appendDummyInput().appendField("시리얼 통신 수신 값 길이");
-        this.setOutput(true, Number);
-        this.setColour("#707070");
-      }
-    };
-
-    Blockly.Blocks['serial_flush'] = {
-      init: function() {
-        this.appendDummyInput().appendField("시리얼 통신 수신 값 비우기");
-        this.setPreviousStatement(true, null);
-        this.setNextStatement(true, null);
-        this.setColour("#707070");
-      }
-    };
-
-    Blockly.Blocks['serial_available_if'] = {
-      init: function() {
-        this.appendDummyInput().appendField("만약 시리얼 통신 수신 값이 있다면");
-        this.appendStatementInput("DO").appendField("실행");
-        this.setPreviousStatement(true, null);
-        this.setNextStatement(true, null);
-        this.setColour("#707070");
-      }
-    };
-
-    // C++ 코드 생성 로직
+    // 코드 변환 엔진
     function generateArduinoCode(workspace) {
       let setupCode = "";
       let loopCode = "";
-      let globalVars = "";
 
-      const variables = workspace.getAllVariables();
-      variables.forEach(v => {
-        globalVars += `int ${v.name} = 0;\n`;
-      });
+      const rootBlock = workspace.getTopBlocks(true).find(b => b.type === 'arduino_setup_loop');
+      if (rootBlock) {
+        setupCode = getBlockCode(rootBlock.getInputTargetBlock('SETUP'), "  ");
+        loopCode = getBlockCode(rootBlock.getInputTargetBlock('LOOP'), "  ");
+      }
 
-      const topBlocks = workspace.getTopBlocks(true);
-      topBlocks.forEach(block => {
-        const code = getBlockCode(block, "  ");
-        loopCode += code;
-      });
-
-      let fullCode = "#include <Arduino.h>\n\n";
-      if (globalVars) fullCode += globalVars + "\n";
-      fullCode += "void setup() {\n" + setupCode + "}\n\n";
-      fullCode += "void loop() {\n" + (loopCode || "  // 반복 실행할 코드\n") + "}";
+      let fullCode = "void setup() {\n" + setupCode + "}\n\n";
+      fullCode += "void loop() {\n" + loopCode + "}";
 
       return fullCode;
     }
@@ -549,10 +415,6 @@
           const state = getExpressionCode(currentBlock.getInputTargetBlock('STATE')) || 'HIGH';
           code += `${indent}pinMode(${pin}, OUTPUT);\n`;
           code += `${indent}digitalWrite(${pin}, ${state});\n`;
-        } else if (currentBlock.type === 'arduino_builtin_led_write') {
-          const state = getExpressionCode(currentBlock.getInputTargetBlock('STATE')) || 'HIGH';
-          code += `${indent}pinMode(LED_BUILTIN, OUTPUT);\n`;
-          code += `${indent}digitalWrite(LED_BUILTIN, ${state});\n`;
         } else if (currentBlock.type === 'arduino_analog_write') {
           const pin = getExpressionCode(currentBlock.getInputTargetBlock('PIN')) || '2';
           const val = getExpressionCode(currentBlock.getInputTargetBlock('VALUE')) || '255';
@@ -561,10 +423,6 @@
         } else if (currentBlock.type === 'arduino_delay') {
           const delayTime = currentBlock.getFieldValue('DELAY_TIME');
           code += `${indent}delay(${delayTime});\n`;
-        } else if (currentBlock.type === 'controls_if') {
-          const condition = getExpressionCode(currentBlock.getInputTargetBlock('IF0')) || 'false';
-          const doCode = getBlockCode(currentBlock.getInputTargetBlock('DO0'), indent + "  ");
-          code += `${indent}if (${condition}) {\n${doCode}${indent}}\n`;
         } else if (currentBlock.type === 'serial_begin') {
           const baud = currentBlock.getFieldValue('BAUD');
           code += `${indent}Serial.begin(${baud});\n`;
@@ -588,7 +446,7 @@
       return "";
     }
 
-    // Blockly 주입
+    // Blockly 초기화
     const blocklyArea = document.getElementById('blocklyArea');
     const blocklyDiv = document.getElementById('blocklyDiv');
 
@@ -598,6 +456,35 @@
       scrollbars: true,
       trashcan: true
     });
+
+    // 기본 블록 세팅 (첫 화면)
+    const initialXml = `
+      <xml xmlns="https://developers.google.com/blockly/xml">
+        <block type="arduino_setup_loop" x="20" y="20">
+          <statement name="SETUP">
+            <block type="serial_begin">
+              <field name="BAUD">9600</field>
+            </block>
+          </statement>
+          <statement name="LOOP">
+            <block type="serial_print">
+              <field name="NEWLINE">TRUE</field>
+              <value name="CONTENT">
+                <shadow type="text">
+                  <field name="TEXT">미레솔 아두이노 테스트</field>
+                </shadow>
+              </value>
+              <next>
+                <block type="arduino_delay">
+                  <field name="DELAY_TIME">1000</field>
+                </block>
+              </next>
+            </block>
+          </statement>
+        </block>
+      </xml>
+    `;
+    Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(initialXml), workspace);
 
     const onresize = function() {
       let element = blocklyArea;
